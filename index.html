@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Daily Art</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <main class="widget">
+
+        <!-- Área da imagem -->
+        <section class="art-container">
+
+            <img
+                id="art"
+                src=""
+                alt="Arte aleatória"
+            >
+
+            <!-- Badge -->
+            <div class="badge">
+                DAILY ART
+            </div>
+
+            <!-- Botão Pinterest -->
+            <a
+                id="pin"
+                class="icon-button pinterest-button"
+                href="#"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Abrir no Pinterest"
+            >
+                ↗
+            </a>
+
+            <!-- Botão sortear -->
+            <button
+                id="shuffle"
+                class="icon-button shuffle-button"
+                title="Sortear outra imagem"
+            >
+                ↻
+            </button>
+
+            <!-- Informações da arte -->
+            <div class="art-info">
+
+                <h1 id="title">
+                    Uma coisa bonita pra hoje.
+                </h1>
+
+                <p id="counter">
+                    Imagem 1 de 3
+                </p>
+
+            </div>
+
+        </section>
+
+        <!-- Rodapé -->
+        <footer class="footer">
+
+            <span>
+                Clique em ↻ para sortear outra
+            </span>
+
+            <button id="next">
+                Nova imagem
+            </button>
+
+        </footer>
+
+    </main>
+
+    <script src="script.js"></script>
+
+</body>
+</html>

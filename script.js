@@ -1,20 +1,8 @@
-const IMAGES = [
-    {
-        src: "images/art-01.jpg",
-        pin: "https://pin.it/3WwRAOVuG",
-        title: "Uma coisa bonita pra hoje."
-    },
-    {
-        src: "images/art-02.jpg",
-        pin: "https://pin.it/COLOQUE-O-LINK-AQUI",
-        title: "Só uma arte pra deixar o dia melhor."
-    },
-    {
-        src: "images/art-03.jpg",
-        pin: "https://pin.it/1LYdZ5u16",
-        title: "Algo bonito no meio da rotina."
-    }
-];
+const GITHUB_API =
+    "https://api.github.com/repos/TheBagomes/Random-Pinterest-Widget/contents/images";
+
+const PINTEREST_BOARD =
+    "https://br.pinterest.com/vitorb4rret0gomes/art/";
 
 const img = document.getElementById("art");
 const pin = document.getElementById("pin");
@@ -24,6 +12,7 @@ const counter = document.getElementById("counter");
 const shuffle = document.getElementById("shuffle");
 const next = document.getElementById("next");
 
+let IMAGES = [];
 let current = Number(
     localStorage.getItem("daily-art-current")
 );
@@ -33,6 +22,61 @@ let savedDate = localStorage.getItem(
 );
 
 const today = new Date().toDateString();
+
+async function loadImages() {
+    try {
+        const response = await fetch(GITHUB_API);
+
+        if (!response.ok) {
+            throw new Error(
+                `Erro ao acessar GitHub: ${response.status}`
+            );
+        }
+
+        const files = await response.json();
+
+        IMAGES = files
+            .filter(file =>
+                file.type === "file" &&
+                /\.(jpg|jpeg|png|webp|gif)$/i.test(file.name)
+            )
+            .map(file => ({
+                src: file.download_url,
+                title: createTitle(file.name),
+                pin: PINTEREST_BOARD
+            }));
+
+        if (IMAGES.length === 0) {
+            throw new Error(
+                "Nenhuma imagem encontrada na pasta images."
+            );
+        }
+
+        loadDailyArt();
+
+    } catch (error) {
+        console.error(error);
+
+        title.textContent =
+            "Não foi possível carregar as artes.";
+
+        counter.textContent =
+            "Verifique a conexão com o GitHub.";
+
+        img.classList.add("loaded");
+    }
+}
+
+function createTitle(filename) {
+    const name = filename
+        .replace(/\.[^/.]+$/, "")
+        .replace(/[-_]+/g, " ")
+        .replace(/\b\w/g, letter =>
+            letter.toUpperCase()
+        );
+
+    return name;
+}
 
 function getRandomIndex() {
     if (IMAGES.length === 1) {
@@ -60,6 +104,11 @@ function showArt(index) {
         current
     );
 
+    localStorage.setItem(
+        "daily-art-date",
+        today
+    );
+
     img.classList.remove("loaded");
 
     img.onload = function () {
@@ -77,7 +126,8 @@ function showArt(index) {
 
     img.src = item.src;
 
-    img.alt = item.title || "Arte";
+    img.alt =
+        item.title || "Arte";
 
     title.textContent =
         item.title || "Uma coisa bonita pra hoje.";
@@ -86,10 +136,14 @@ function showArt(index) {
         `Imagem ${index + 1} de ${IMAGES.length}`;
 
     pin.href =
-        item.pin || "#";
+        item.pin || PINTEREST_BOARD;
 }
 
 function pickRandom() {
+    if (IMAGES.length === 0) {
+        return;
+    }
+
     const index = getRandomIndex();
 
     showArt(index);
@@ -102,14 +156,9 @@ function loadDailyArt() {
         current >= IMAGES.length ||
         savedDate !== today
     ) {
-        current = getRandomIndex();
+        const index = getRandomIndex();
 
-        localStorage.setItem(
-            "daily-art-date",
-            today
-        );
-
-        showArt(current);
+        showArt(index);
 
         return;
     }
@@ -127,4 +176,4 @@ next.addEventListener(
     pickRandom
 );
 
-loadDailyArt();
+loadImages();
